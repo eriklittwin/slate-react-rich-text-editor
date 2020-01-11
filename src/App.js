@@ -2,36 +2,30 @@ import React, { useCallback, useMemo, useState } from 'react';
 import './App.scss';
 import { Editable, Slate, withReact } from "slate-react";
 import { createEditor } from "slate";
-import CodeElement from "./components/elements/CodeElement";
-import DefaultElement from "./components/elements/DefaultElement";
 import Leaf from "./components/Leaf";
 import CustomEditor from "./helpers/CustomEditor";
 import Toolbar from "./components/Toolbar";
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
+import isHotkey from "is-hotkey";
+import { HOTKEYS, LIST_TYPES } from './helpers/constants';
+import Element from "./components/Element";
 
 function App() {
   const editor = useMemo(() => withReact(createEditor()), []);
+
+  // set initial state
+  const savedContent = JSON.parse(localStorage.getItem('content'));
   const [value, setValue] = useState(
-    JSON.parse(localStorage.getItem('content')) || [
+    savedContent[0].children[0].text ? savedContent : [
       {
         type: 'paragraph',
-        children: [{ text: 'A line of text in a paragraph.' }],
+        children: [{ text: 'Enter some rich text…' }],
       }
     ]);
 
-  const renderElement = useCallback(props => {
-    switch (props.element.type) {
-      case 'code':
-        return <CodeElement { ...props }/>
-      default:
-        return <DefaultElement { ...props }/>
-    }
-  }, []);
-
-  const renderLeaf = useCallback(props => {
-    return <Leaf { ...props }/>
-  }, []);
+  const renderElement = useCallback(props => <Element {...props} />, []);
+  const renderLeaf = useCallback(props => <Leaf { ...props }/>, []);
 
   const handleChange = (value) => {
     setValue(value);
@@ -41,31 +35,13 @@ function App() {
   };
 
   const handleKeyDown = event => {
-    if (!event.ctrlKey) return;
-
-    switch (event.key) {
-      case 'c':
+    for (const hotkey in HOTKEYS) {
+      if (isHotkey(hotkey, event)) {
         event.preventDefault();
-        CustomEditor.toggleCodeBlock(editor);
 
-        break;
-      case 'b':
-        event.preventDefault();
-        CustomEditor.toggleBoldMark(editor);
-
-        break;
-      case 'i':
-        event.preventDefault();
-        CustomEditor.toggleItalicMark(editor);
-
-        break;
-      case 'u':
-        event.preventDefault();
-        CustomEditor.toggleUnderlineMark(editor);
-
-        break;
-      default:
-        return;
+        const mark = HOTKEYS[hotkey];
+        CustomEditor.toggleMark(editor, mark);
+      }
     }
   };
 
@@ -73,9 +49,10 @@ function App() {
     <div className="App">
       <Slate editor={ editor } value={ value } onChange={ value => handleChange(value) }>
         <Container>
-          <Card>
+          <h1 className="mt-4">Rich Text Editor</h1>
+          <Card className="mt-2">
             <Card.Header>
-              <Toolbar editor={ editor }/>
+              <Toolbar/>
             </Card.Header>
 
             <Card.Body>

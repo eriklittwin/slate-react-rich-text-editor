@@ -1,72 +1,48 @@
 import { Editor, Text, Transforms } from "slate";
+import { LIST_TYPES } from "./constants";
 
 const CustomEditor = {
-  isBoldMarkActive: (editor) => {
+  isMarkActive: (editor, format) => {
     const [match] = Editor.nodes(editor, {
-      match: n => n.bold === true,
+      match: node => node[format] === true,
       universal: true,
     });
 
     return !!match;
   },
-  isItalicMarkActive: (editor) => {
+  toggleMark: (editor, format) => {
+    const isActive = CustomEditor.isMarkActive(editor, format);
+
+    Transforms.setNodes(
+      editor,
+      { [format]: isActive ? null : true },
+      { match: node => Text.isText(node), split: true },
+    );
+  },
+  isBlockActive: (editor, format) => {
     const [match] = Editor.nodes(editor, {
-      match: n => n.italic === true,
-      universal: true,
+      match: node => node.type === format,
     });
 
     return !!match;
   },
-  isUnderlineMarkActive: (editor) => {
-    const [match] = Editor.nodes(editor, {
-      match: n => n.underline === true,
-      universal: true,
+  toggleBlock: (editor, format) => {
+    const isActive = CustomEditor.isBlockActive(editor, format)
+    const isList = LIST_TYPES.includes(format)
+
+    Transforms.unwrapNodes(editor, {
+      match: node => LIST_TYPES.includes(node.type),
+      split: true,
     });
 
-    return !!match;
-  },
-  isCodeBlockActive: (editor) => {
-    const [match] = Editor.nodes(editor, {
-      match: n => n.type === 'code',
+    Transforms.setNodes(editor, {
+      type: isActive ? 'paragraph' : isList ? 'list-item' : format,
     });
 
-    return !!match;
-  },
-  toggleBoldMark: (editor) => {
-    const isActive = CustomEditor.isBoldMarkActive(editor);
-
-    Transforms.setNodes(
-      editor,
-      { bold: isActive ? null : true },
-      { match: n => Text.isText(n), split: true },
-    );
-  },
-  toggleItalicMark: (editor) => {
-    const isActive = CustomEditor.isItalicMarkActive(editor);
-
-    Transforms.setNodes(
-      editor,
-      { italic: isActive ? null : true },
-      { match: n => Text.isText(n), split: true },
-    );
-  },
-  toggleUnderlineMark: (editor) => {
-    const isActive = CustomEditor.isUnderlineMarkActive(editor);
-
-    Transforms.setNodes(
-      editor,
-      { underline: isActive ? null : true },
-      { match: n => Text.isText(n), split: true },
-    );
-  },
-  toggleCodeBlock: (editor) => {
-    const isActive = CustomEditor.isCodeBlockActive(editor);
-
-    Transforms.setNodes(
-      editor,
-      { type: isActive ? null : 'code' },
-      { match: n => Editor.isBlock(editor, n) },
-    );
+    if (!isActive && isList) {
+      const block = { type: format, children: [] };
+      Transforms.wrapNodes(editor, block)
+    }
   },
 };
 
