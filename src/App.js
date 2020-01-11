@@ -8,7 +8,7 @@ import Toolbar from "./components/Toolbar";
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
 import isHotkey from "is-hotkey";
-import { HOTKEYS, LIST_TYPES } from './helpers/constants';
+import { HOTKEYS } from './helpers/constants';
 import Element from "./components/Element";
 
 function App() {
