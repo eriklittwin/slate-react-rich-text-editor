@@ -7,6 +7,7 @@ import DefaultElement from "./components/elements/DefaultElement";
 import Leaf from "./components/Leaf";
 import CustomEditor from "./helpers/CustomEditor";
 import Toolbar from "./components/Toolbar";
+import Container from "react-bootstrap/Container";
 
 function App() {
   const editor = useMemo(() => withReact(createEditor()), []);
@@ -52,6 +53,16 @@ function App() {
         CustomEditor.toggleBoldMark(editor);
 
         break;
+      case 'i':
+        event.preventDefault();
+        CustomEditor.toggleItalicMark(editor);
+
+        break;
+      case 'u':
+        event.preventDefault();
+        CustomEditor.toggleUnderlineMark(editor);
+
+        break;
       default:
         return;
     }
@@ -60,10 +71,12 @@ function App() {
   return (
     <div className="App">
       <Slate editor={ editor } value={ value } onChange={ value => handleChange(value) }>
-        <Toolbar editor={ editor }/>
-        <Editable renderElement={ renderElement }
-                  renderLeaf={ renderLeaf }
-                  onKeyDown={ event => handleKeyDown(event) }/>
+        <Container>
+          <Toolbar editor={ editor }/>
+          <Editable renderElement={ renderElement }
+                    renderLeaf={ renderLeaf }
+                    onKeyDown={ event => handleKeyDown(event) }/>
+        </Container>
       </Slate>
     </div>
   );

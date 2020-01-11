@@ -15,6 +15,22 @@ const Toolbar = ({ editor }) => {
       <button
         onMouseDown={ event => {
           event.preventDefault()
+          CustomEditor.toggleItalicMark(editor)
+        } }
+      >
+        Italic
+      </button>
+      <button
+        onMouseDown={ event => {
+          event.preventDefault()
+          CustomEditor.toggleUnderlineMark(editor)
+        } }
+      >
+        Underline
+      </button>
+      <button
+        onMouseDown={ event => {
+          event.preventDefault()
           CustomEditor.toggleCodeBlock(editor)
         } }
       >
