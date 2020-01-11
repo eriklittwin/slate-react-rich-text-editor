@@ -8,6 +8,7 @@ import Leaf from "./components/Leaf";
 import CustomEditor from "./helpers/CustomEditor";
 import Toolbar from "./components/Toolbar";
 import Container from "react-bootstrap/Container";
+import Card from "react-bootstrap/Card";
 
 function App() {
   const editor = useMemo(() => withReact(createEditor()), []);
@@ -72,10 +73,17 @@ function App() {
     <div className="App">
       <Slate editor={ editor } value={ value } onChange={ value => handleChange(value) }>
         <Container>
-          <Toolbar editor={ editor }/>
-          <Editable renderElement={ renderElement }
-                    renderLeaf={ renderLeaf }
-                    onKeyDown={ event => handleKeyDown(event) }/>
+          <Card>
+            <Card.Header>
+              <Toolbar editor={ editor }/>
+            </Card.Header>
+
+            <Card.Body>
+              <Editable renderElement={ renderElement }
+                        renderLeaf={ renderLeaf }
+                        onKeyDown={ event => handleKeyDown(event) }/>
+            </Card.Body>
+          </Card>
         </Container>
       </Slate>
     </div>
